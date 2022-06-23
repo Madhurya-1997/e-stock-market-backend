@@ -23,22 +23,26 @@ public class StockController {
 
 
     @PostMapping("/add/{companyCode}")
-    public Stock addNewStock(@RequestHeader("Authorization") String token,
+    public Stock addNewStock(@RequestHeader("e-stock-market-trace-id") String traceID,
+                             @RequestHeader("Authorization") String token,
                              @PathVariable("companyCode")String companyCode,
                              @RequestBody Stock stock){
-        return stockService.addNewStock(token, companyCode, stock);
+        return stockService.addNewStock(traceID, token, companyCode, stock);
     }
 
     @GetMapping("/get/{companyCode}")
-    public Page<Stock> getListOfStocksForCompany(Pageable pageable, @PathVariable("companyCode")String companyCode){
-        return stockService.getListOfStocksForCompany(pageable, companyCode);
+    public Page<Stock> getListOfStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                                 Pageable pageable,
+                                                 @PathVariable("companyCode")String companyCode){
+        return stockService.getListOfStocksForCompany(traceID, pageable, companyCode);
     }
 
     @GetMapping("/get/{companyCode}/{startDate}/{endDate}")
-    public Page<Stock> getListOfStocksForCompanyWithinTimeSpan(Pageable pageable,
+    public Page<Stock> getListOfStocksForCompanyWithinTimeSpan(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                                               Pageable pageable,
                                                                @PathVariable("companyCode")String companyCode,
                                                                @PathVariable("startDate")String startDate,
                                                                @PathVariable("endDate")String endDate){
-        return stockService.getListOfStocksForCompanyWithinTimeSpan(pageable, companyCode, startDate, endDate);
+        return stockService.getListOfStocksForCompanyWithinTimeSpan(traceID, pageable, companyCode, startDate, endDate);
     }
 }

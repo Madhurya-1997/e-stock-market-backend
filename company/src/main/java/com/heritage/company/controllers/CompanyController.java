@@ -25,26 +25,29 @@ public class CompanyController {
 
 
     @GetMapping("/getall")
-    public List<Company> findAllCompanies() {
-        return companyService.getAllCompanies();
+    public List<Company> findAllCompanies(@RequestHeader("e-stock-market-trace-id") String traceID) {
+        return companyService.getAllCompanies(traceID);
     }
 
 
     @PostMapping("/")
-    public Company addNewCompany(@RequestHeader("Authorization") String token,
-                                 @RequestBody @Valid Company company) {
-        return companyService.addNewCompany(token, company);
+    public Company addNewCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                 @RequestHeader("Authorization") String token,
+                                 @RequestBody @Valid CompanyRequest company) {
+        return companyService.addNewCompany(traceID, token, company);
     }
 
     @GetMapping("/info/{code}")
-    public Company findCompany(@PathVariable ( value = "code") String code) {
-        return companyService.getCompanyFromCode(code);
+    public Company findCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+                               @PathVariable ( value = "code") String code) {
+        return companyService.getCompanyFromCode(traceID, code);
     }
 
     @DeleteMapping("/delete/{code}")
-    public void deleteCompany(@RequestHeader("Authorization") String token,
+    public void deleteCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+                              @RequestHeader("Authorization") String token,
                               @PathVariable ( value = "code") String code) {
-        companyService.deleteCompany(token, code);
+        companyService.deleteCompany(traceID, token, code);
     }
 
 }

@@ -30,7 +30,8 @@ public class CompanyServiceImpl implements CompanyService{
     private CompanyRepository companyRepository;
 
     @Override
-    public List<Company> getAllCompanies() {
+    public List<Company> getAllCompanies(String traceID) {
+        log.debug("Invoking getAllCompanies service with trace ID: " + traceID);
         return companyRepository.findAll();
     }
 
@@ -38,12 +39,12 @@ public class CompanyServiceImpl implements CompanyService{
 //    @Retry(name = "retryAddNewCompanyFallback", fallbackMethod = "addNewCompanyFallback")
 //    @CircuitBreaker(name = "addNewCompanyCircuitBreaker", fallbackMethod = "addNewCompanyFallback")
     @Override
-    public Company addNewCompany(String token, Company company) {
+    public Company addNewCompany(String traceID, String token, CompanyRequest company) {
 
-        log.debug("Invoking addNewCompany service...");
+        log.debug("Invoking addNewCompany service with trace ID: " + traceID);
 
         Optional<Company> existingCompany = companyRepository.findByCode(company.getCode());
-        AuthResponse authResponse = invokeAuthServiceClient(token);
+        AuthResponse authResponse = invokeAuthServiceClient(traceID, token);
 //        AuthResponse authResponse = null;
 //
 //        try {
@@ -58,13 +59,23 @@ public class CompanyServiceImpl implements CompanyService{
             throw new CompanyAlreadyExistsException();
         }
 
-        company.setUsername(authResponse.getUsername());
-        return companyRepository.save(company);
+        Company newCompany = new Company();
+        newCompany.setUsername(authResponse.getUsername());
+        newCompany.setCode(company.getCode());
+        newCompany.setWebsite(company.getWebsite());
+        newCompany.setCeo(company.getCeo());
+        newCompany.setTurnover(company.getTurnover());
+        newCompany.setName(company.getName());
+        newCompany.setStockExchangeEnlisted(company.getStockExchangeEnlisted());
+
+        return companyRepository.save(newCompany);
     }
 
 
     @Override
-    public Company getCompanyFromCode(String code) {
+    public Company getCompanyFromCode(String traceID, String code) {
+        log.debug("Invoking getCompanyFromCode service with trace ID: " + traceID);
+
         Optional<Company> existingCompany = companyRepository.findByCode(code);
 
         if (existingCompany.isEmpty()) {
@@ -74,18 +85,13 @@ public class CompanyServiceImpl implements CompanyService{
     }
 
     @Override
-    public void deleteCompany(String token, String code) {
+    public void deleteCompany(String traceID, String token, String code) {
 
-        log.debug("Invoking deleteCompany service...");
+        log.debug("Invoking deleteCompany service with trace ID: " + traceID);
 
         Optional<Company> existingCompany = companyRepository.findByCode(code);
-        AuthResponse authResponse = null;
+        AuthResponse authResponse = invokeAuthServiceClient(traceID, token);
 
-        try {
-            authResponse = authClient.verifyUser(token);
-        } catch(Exception e) {
-            throw new UserTokenExpiredException();
-        }
         if (authResponse == null) {
             throw new UserNotFoundException();
         }
@@ -97,8 +103,8 @@ public class CompanyServiceImpl implements CompanyService{
 
 
     @Retry(name = "retryAddNewCompanyFallback", fallbackMethod = "addNewCompanyFallback")
-    private AuthResponse invokeAuthServiceClient(String token) {
-       return authClient.verifyUser(token);
+    private AuthResponse invokeAuthServiceClient(String traceID, String token) {
+       return authClient.verifyUser(traceID, token);
     }
 
     private Company addNewCompanyFallback(String token, CompanyRequest company, Throwable t) {

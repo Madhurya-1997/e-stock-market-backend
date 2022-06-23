@@ -15,5 +15,6 @@ public interface AuthClient {
 
 
     @GetMapping(value="/auth/validate")
-    public AuthResponse verifyUser(@RequestHeader("Authorization") String token);
+    public AuthResponse verifyUser(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                   @RequestHeader("Authorization") String token);
 }

@@ -1,35 +1,27 @@
 package com.heritage.auth.controllers;
 
-import com.heritage.auth.exceptions.UserAlreadyExistsException;
-import com.heritage.auth.exceptions.UserTokenExpiredException;
-import com.heritage.auth.models.User;
 import com.heritage.auth.repositories.UserRepository;
 import com.heritage.auth.security.JwtUtil;
 import com.heritage.auth.services.MyUserDetailsService;
-import com.heritage.auth.services.UserServiceImpl;
 import com.heritage.auth.util.AuthRequest;
 import com.heritage.auth.util.AuthResponse;
-import io.jsonwebtoken.Claims;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 import java.nio.file.AccessDeniedException;
 
-@Slf4j
 @RestController
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
 
     @Autowired
     private AuthenticationManager manager;
@@ -53,7 +45,11 @@ public class AuthController {
      * Login as a user
      */
     @GetMapping("/authenticate")
-    public ResponseEntity<AuthResponse> createAuthenticationToken(@RequestBody AuthRequest req) throws Exception {
+    public ResponseEntity<AuthResponse> createAuthenticationToken(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                                                  @RequestBody AuthRequest req) throws Exception {
+
+        logger.debug("Invoking createAuthenticationToken service with trace ID: " + traceID);
+
         try {
             manager.authenticate(new UsernamePasswordAuthenticationToken(
                     req.getUsername(), req.getPassword()
@@ -69,9 +65,11 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    public AuthResponse verifyUser(@RequestHeader("Authorization") String token) throws AccessDeniedException {
+    public AuthResponse verifyUser(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                   @RequestHeader("Authorization") String token) throws AccessDeniedException {
 
-        log.debug("Invoking validate controller...");
+        logger.debug("Invoking verifyUser service with trace ID: " + traceID);
+
         UserDetails userDetails = (UserDetails)SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 

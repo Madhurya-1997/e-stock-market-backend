@@ -9,6 +9,8 @@ import com.heritage.stock.exceptions.UserTokenExpiredException;
 import com.heritage.stock.models.Company;
 import com.heritage.stock.models.Stock;
 import com.heritage.stock.repository.StockRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +22,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+
 @Service
 public class StockServiceImpl implements StockService{
+
+    private static final Logger logger = LoggerFactory.getLogger(StockServiceImpl.class);
+
 
     @Autowired
     private StockRepository stockRepository;
@@ -33,9 +39,12 @@ public class StockServiceImpl implements StockService{
 
 
     @Override
-    public Stock addNewStock(String token, String companyCode, Stock stock) {
-        Company company = companyClient.findCompany(companyCode);
-        AuthResponse authResponse = authClient.verifyUser(token);
+    public Stock addNewStock(String traceID, String token, String companyCode, Stock stock) {
+
+        logger.debug("Invoking addNewStock service with trace ID: " + traceID);
+
+        Company company = companyClient.findCompany(traceID, companyCode);
+        AuthResponse authResponse = authClient.verifyUser(traceID, token);
 
 //        try {
 //            authResponse = authClient.verifyUser(token);
@@ -60,13 +69,15 @@ public class StockServiceImpl implements StockService{
     // pagination:
     // https://medium.com/javarevisited/spring-boot-mongodb-searching-and-pagination-1a6c1802024a
     @Override
-    public Page<Stock> getListOfStocksForCompany(Pageable pageable, String companyCode) {
+    public Page<Stock> getListOfStocksForCompany(String traceID, Pageable pageable, String companyCode) {
         return null;
     }
 
     @Override
-    public Page<Stock> getListOfStocksForCompanyWithinTimeSpan(Pageable pageable, String companyCode, String startDate, String endDate) {
-        return null;
+    public Page<Stock> getListOfStocksForCompanyWithinTimeSpan(String traceID, Pageable pageable, String companyCode, String startDate, String endDate) {
+        logger.debug("Invoking getListOfStocksForCompanyWithinTimeSpan service with trace ID: " + traceID);
+
+        return stockRepository.findAll(pageable);
     }
 
     private Date addHoursToJavaUtilDate(Date date, Integer hours) {

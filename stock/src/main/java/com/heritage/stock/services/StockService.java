@@ -3,16 +3,21 @@ package com.heritage.stock.services;
 import com.heritage.stock.models.Stock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface StockService {
-    public Stock addNewStock(String token,
+    public Stock addNewStock(String traceID,
+                             String token,
                              String companyCode,
                              Stock stock);
-    public Page<Stock> getListOfStocksForCompany(Pageable pageable,
+    public Page<Stock> getListOfStocksForCompany(String traceID,
+                                                 Pageable pageable,
                                                  String companyCode);
-    public Page<Stock> getListOfStocksForCompanyWithinTimeSpan(Pageable pageable,
+    public Page<Stock> getListOfStocksForCompanyWithinTimeSpan(String traceID,
+                                                               Pageable pageable,
                                                                String companyCode,
                                                                String startDate,
                                                                String endDate);

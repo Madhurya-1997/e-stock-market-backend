@@ -25,8 +25,9 @@ public class UserController {
      * Registration of a user
      */
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid User user) {
-        return new ResponseEntity<User>(userService.register(user), HttpStatus.OK);
+    public ResponseEntity<User> register(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                         @RequestBody @Valid User user) {
+        return new ResponseEntity<User>(userService.register(traceID, user), HttpStatus.OK);
     }
 
     @GetMapping("/")
@@ -37,9 +38,10 @@ public class UserController {
 
 
     @PutMapping("/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable(value = "userId") String userId,
+    public ResponseEntity<User> updateUser(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                           @PathVariable(value = "userId") String userId,
                                            @RequestBody @Valid User userRequest) {
-        return new ResponseEntity<User>(userService.update(userId, userRequest), HttpStatus.OK);
+        return new ResponseEntity<User>(userService.update(traceID, userId, userRequest), HttpStatus.OK);
     }
 
 }
