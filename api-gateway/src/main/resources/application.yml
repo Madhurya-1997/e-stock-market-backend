@@ -1,0 +1,52 @@
+server:
+  port: 1000
+
+
+## API Gateway will fetch all details from Eureka server for routing
+spring:
+  application:
+    name: api-gateway-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+#  config:
+#    import: "optional:configserver:http://localhost:8071/"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+## Configuring info endpoint
+info:
+  app:
+    name: API Gateway
+    description: API Gateway for E Stock Market Server Application
+    version: 1.0.0
+
+
+
+logging:
+  level:
+    org:
+      springframework: info
+  pattern:
+    console: "%d{dd-MM-yy} %d{HH:mm:ss.SSS} %-20.20thread %5p %-25.25logger{25} %25M %4L %m%n"
+
+
+
+eureka:
+  client:
+    service-url:
+      default-zone: ${EUREKA_URI:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+    healthcheck:
+      enabled: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10

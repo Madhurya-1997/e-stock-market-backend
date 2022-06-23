@@ -1,0 +1,158 @@
+{
+	"info": {
+		"_postman_id": "f5db02a1-4e7a-401d-86e2-2d7d2aa01184",
+		"name": "Company APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/company/",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuaWxvZmFyIiwiZXhwIjoxNjU1NTk1NzQ5LCJpYXQiOjE2NTU1NTk3NDl9.ip4YHhUmH6utyApiuC2yJEhuN3Uex2dlqKTNJlqGfuA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "    {\r\n        \"code\": \"N11\",\r\n        \"name\": \"Naruto\",\r\n        \"ceo\": \"Dame Dame\",\r\n        \"turnover\": 1000000000,\r\n        \"website\": \"naruto.com\",\r\n        \"stockExchangeEnlisted\": \"NSE\"\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:1000/company-app/company/",
+					"host": [
+						"localhost"
+					],
+					"port": "1000",
+					"path": [
+						"company-app",
+						"company",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/company/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:1000/company-app/company/",
+					"host": [
+						"localhost"
+					],
+					"port": "1000",
+					"path": [
+						"company-app",
+						"company",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:1000/auth-app/authenticate",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"nilofar\",\r\n    \"password\": \"nilo123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:1000/auth-app/authenticate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1000",
+					"path": [
+						"auth-app",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:1000/validate",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuaWxvZmFyIiwiZXhwIjoxNjU1NDg4NzkxLCJpYXQiOjE2NTU0NTI3OTF9.KB8xamXxO4xB6STdw2vlWvMI5eZrGfWfIiUoIeM7dIo",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:1000/validate",
+					"host": [
+						"localhost"
+					],
+					"port": "1000",
+					"path": [
+						"validate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:1000/api/v1.0/market/company-service/company/",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaW5nbGUiLCJleHAiOjE2NTU5NTcyODEsImlhdCI6MTY1NTkyMTI4MX0.ywbQ0BbCKNNIWHoGyA7nNLSVqzLITxnzKW1tSZHUEgc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"code\": \"N11\",\r\n    \"name\": \"Naruto\",\r\n    \"ceo\": \"Dame Dame\",\r\n    \"turnover\": 1000000000,\r\n    \"website\": \"naruto.com\",\r\n    \"stockExchangeEnlisted\": \"NSE\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:1000/api/v1.0/market/company-service/company/",
+					"host": [
+						"localhost"
+					],
+					"port": "1000",
+					"path": [
+						"api",
+						"v1.0",
+						"market",
+						"company-service",
+						"company",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

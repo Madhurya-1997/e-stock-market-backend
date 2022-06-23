@@ -1,0 +1,48 @@
+{
+	"info": {
+		"_postman_id": "e59f37b3-2ae2-4b09-981f-2b0c6efbe954",
+		"name": "Stock APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Stock service API",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaW5nbGUiLCJleHAiOjE2NTU5NTcyODEsImlhdCI6MTY1NTkyMTI4MX0.ywbQ0BbCKNNIWHoGyA7nNLSVqzLITxnzKW1tSZHUEgc",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"stockPrice\": 10.05,\r\n    \"stockDuration\": 6\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:1000/api/v1.0/market/stock-service/stock/add/N11",
+					"host": [
+						"localhost"
+					],
+					"port": "1000",
+					"path": [
+						"api",
+						"v1.0",
+						"market",
+						"stock-service",
+						"stock",
+						"add",
+						"N11"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
