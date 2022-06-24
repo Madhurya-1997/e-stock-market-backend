@@ -5,6 +5,10 @@ import com.heritage.auth.security.JwtUtil;
 import com.heritage.auth.services.MyUserDetailsService;
 import com.heritage.auth.util.AuthRequest;
 import com.heritage.auth.util.AuthResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +40,15 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
 
+    @Operation(summary = "Display home page")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Home page is working",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "Resource not available",
+                    content = @Content)
+    })
     @GetMapping("/")
     public String welcome() {
         return ("<h1>Welcome to Auth Service!!</h1>");
@@ -44,6 +57,18 @@ public class AuthController {
     /**
      * Login as a user
      */
+    @Operation(summary = "Login as a User")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Login Successful",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400",
+                    description = "Invalid Login Credentials",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "Resource not available",
+                    content = @Content)
+    })
     @GetMapping("/authenticate")
     public ResponseEntity<AuthResponse> createAuthenticationToken(@RequestHeader("e-stock-market-trace-id") String traceID,
                                                                   @RequestBody AuthRequest req) throws Exception {
@@ -64,6 +89,18 @@ public class AuthController {
                 userRepository.findUserByUsername(userDetails.getUsername()).get().getEmail()));
     }
 
+    @Operation(summary = "Validate the logged in User with JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Validation Successful",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400",
+                    description = "Invalid Token or Token Expired",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "Resource not available",
+                    content = @Content)
+    })
     @GetMapping("/validate")
     public AuthResponse verifyUser(@RequestHeader("e-stock-market-trace-id") String traceID,
                                    @RequestHeader("Authorization") String token) throws AccessDeniedException {

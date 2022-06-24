@@ -2,10 +2,7 @@ package com.heritage.company.services;
 
 import com.heritage.company.clients.AuthClient;
 import com.heritage.company.clients.AuthResponse;
-import com.heritage.company.exceptions.CompanyAlreadyExistsException;
-import com.heritage.company.exceptions.CompanyNotFoundException;
-import com.heritage.company.exceptions.UserNotFoundException;
-import com.heritage.company.exceptions.UserTokenExpiredException;
+import com.heritage.company.exceptions.*;
 import com.heritage.company.models.Company;
 import com.heritage.company.models.CompanyFallback;
 import com.heritage.company.models.CompanyRequest;
@@ -97,6 +94,10 @@ public class CompanyServiceImpl implements CompanyService{
         }
         if (existingCompany.isEmpty()) {
            throw new CompanyNotFoundException();
+        }
+
+        if (!authResponse.getUsername().equalsIgnoreCase(existingCompany.get().getUsername())) {
+            throw new NotAllowedException();
         }
         companyRepository.deleteByCode(code);
     }
