@@ -1,2 +1,4 @@
-package com.heritage.auth.config;public class AuthServiceConfig {
+package com.heritage.auth.config;
+
+public class AuthServiceConfig {
 }

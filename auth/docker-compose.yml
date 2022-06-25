@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  auth_mongo_db:
+    image: mongo:latest
+    container_name: auth_mongo_db
+    restart: always
+    ports:
+      - 27017:27017
+  company-service:
+    image: heritage/auth-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: always
+    ports:
+      - 9090:9090
+    depends_on:
+      - auth_mongo_db

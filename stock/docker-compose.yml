@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  stock_mongo_db:
+    image: mongo:latest
+    container_name: stock_mongo_db
+    restart: always
+    ports:
+      - 27017:27017
+  company-service:
+    image: heritage/stock-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stock-service
+    restart: always
+    ports:
+      - 7070:7070
+    depends_on:
+      - stock_mongo_db

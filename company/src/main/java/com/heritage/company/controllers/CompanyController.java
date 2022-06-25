@@ -1,10 +1,14 @@
 package com.heritage.company.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.heritage.company.config.CompanyServiceConfig;
+import com.heritage.company.models.CompanyProperties;
 import com.heritage.company.models.CompanyRequest;
-import com.heritage.company.repositories.CompanyRepository;
 import com.heritage.company.models.Company;
 import com.heritage.company.services.CompanyService;
-import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,6 +25,9 @@ public class CompanyController {
 
     @Autowired
     private CompanyService companyService;
+
+    @Autowired
+    private CompanyServiceConfig companyServiceConfig;
 
 
     @Operation(summary = "Display home page")
@@ -49,6 +56,7 @@ public class CompanyController {
                     content = @Content)
     })
     @GetMapping("/getall")
+    @Timed(value = "findAllCompanies.time", description = "Time taken to return all company details")
     public List<Company> findAllCompanies(@RequestHeader("e-stock-market-trace-id") String traceID) {
         return companyService.getAllCompanies(traceID);
     }
@@ -73,6 +81,7 @@ public class CompanyController {
                     content = @Content)
     })
     @PostMapping("/")
+    @Timed(value = "addNewCompany.time", description = "Time taken to register a new company")
     public Company addNewCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
                                  @RequestHeader("Authorization") String token,
                                  @RequestBody @Valid CompanyRequest company) {
@@ -89,6 +98,7 @@ public class CompanyController {
                     content = @Content)
     })
     @GetMapping("/info/{code}")
+    @Timed(value = "findCompany.time", description = "Time taken to find company based on company code")
     public Company findCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
                                @PathVariable ( value = "code") String code) {
         return companyService.getCompanyFromCode(traceID, code);
@@ -114,10 +124,16 @@ public class CompanyController {
                     content = @Content)
     })
     @DeleteMapping("/delete/{code}")
+    @Timed(value = "deleteCompany.time", description = "Time taken to delete company based on company code")
     public void deleteCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
                               @RequestHeader("Authorization") String token,
                               @PathVariable ( value = "code") String code) {
         companyService.deleteCompany(traceID, token, code);
+    }
+
+    @GetMapping("/properties")
+    public String getPropertyDetails() throws JsonProcessingException{
+        return companyService.getPropertyDetails();
     }
 
 }

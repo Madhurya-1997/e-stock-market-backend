@@ -1,10 +1,15 @@
 package com.heritage.company.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.heritage.company.clients.AuthClient;
 import com.heritage.company.clients.AuthResponse;
+import com.heritage.company.config.CompanyServiceConfig;
 import com.heritage.company.exceptions.*;
 import com.heritage.company.models.Company;
 import com.heritage.company.models.CompanyFallback;
+import com.heritage.company.models.CompanyProperties;
 import com.heritage.company.models.CompanyRequest;
 import com.heritage.company.repositories.CompanyRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -30,6 +35,9 @@ public class CompanyServiceImpl implements CompanyService{
 
     @Autowired
     private CompanyRepository companyRepository;
+
+    @Autowired
+    private CompanyServiceConfig companyServiceConfig;
 
     @Override
     public List<Company> getAllCompanies(String traceID) {
@@ -113,6 +121,17 @@ public class CompanyServiceImpl implements CompanyService{
             throw new NotAllowedException();
         }
         companyRepository.deleteByCode(code);
+    }
+
+    @Override
+    public String getPropertyDetails() throws JsonProcessingException {
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        CompanyProperties properties = new CompanyProperties(companyServiceConfig.getMessage(),
+                companyServiceConfig.getBuildVersion(),
+                companyServiceConfig.getMailDetails(),
+                companyServiceConfig.getStockExchange());
+        String jsonStr = ow.writeValueAsString(properties);
+        return jsonStr;
     }
 
 
