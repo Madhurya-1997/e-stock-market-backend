@@ -10,6 +10,8 @@ import com.heritage.company.repositories.CompanyRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -17,9 +19,12 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class CompanyServiceImpl implements CompanyService{
+
+    private static final Logger log = LoggerFactory.getLogger(CompanyServiceImpl.class);
+
+
     @Autowired
     private AuthClient authClient;
 
@@ -41,7 +46,11 @@ public class CompanyServiceImpl implements CompanyService{
         log.debug("Invoking addNewCompany service with trace ID: " + traceID);
 
         Optional<Company> existingCompany = companyRepository.findByCode(company.getCode());
+        log.debug("Existing company is: " + existingCompany + " with trace ID: " + traceID);
+
         AuthResponse authResponse = invokeAuthServiceClient(traceID, token);
+        log.debug("Existing user is: " + authResponse.getUsername() + " with trace ID: " + traceID);
+
 //        AuthResponse authResponse = null;
 //
 //        try {
@@ -87,7 +96,11 @@ public class CompanyServiceImpl implements CompanyService{
         log.debug("Invoking deleteCompany service with trace ID: " + traceID);
 
         Optional<Company> existingCompany = companyRepository.findByCode(code);
+        log.debug("Existing company is: " + existingCompany + " with trace ID: " + traceID);
+
         AuthResponse authResponse = invokeAuthServiceClient(traceID, token);
+        log.debug("Existing user is: " + authResponse.getUsername() + " with trace ID: " + traceID);
+
 
         if (authResponse == null) {
             throw new UserNotFoundException();

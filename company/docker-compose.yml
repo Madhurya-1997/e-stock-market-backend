@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  company-service:
+    build: .
+    restart: always
+    ports:
+    - 8080:8080
+    depends_on:
+      - mongo_db:company_db
+  mongo_db:
+    image: "mongo:latest"
+    restart: always
+    ports:
+      - 27017:27017
+

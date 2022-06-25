@@ -44,7 +44,10 @@ public class StockServiceImpl implements StockService{
         logger.debug("Invoking addNewStock service with trace ID: " + traceID);
 
         Company company = companyClient.findCompany(traceID, companyCode);
+        logger.debug("Existing company is: " + company + " with trace ID: " + traceID);
+
         AuthResponse authResponse = authClient.verifyUser(traceID, token);
+        logger.debug("Existing user is: " + authResponse.getUsername() + " with trace ID: " + traceID);
 
 //        try {
 //            authResponse = authClient.verifyUser(token);

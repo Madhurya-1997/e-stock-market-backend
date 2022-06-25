@@ -11,6 +11,7 @@
 	<groupId>com.heritage</groupId>
 	<artifactId>stock</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>stock</name>
 	<description>Microservice for Stock</description>
 	<properties>
