@@ -71,4 +71,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public void  springUserTokenExpiredHandleIssue(HttpServletResponse response) throws IOException{
         response.sendError(HttpStatus.UNAUTHORIZED.value(), "Authentication service is not responding or user token has expired. Try to login later !!");
     }
+
+    @ExceptionHandler(StockClientNotFoundException.class)
+    public void  springStockClientNotFoundHandleIssue(HttpServletResponse response) throws IOException{
+        response.sendError(HttpStatus.UNAUTHORIZED.value(), "Stock service is not responding. Try to login later !!");
+    }
 }

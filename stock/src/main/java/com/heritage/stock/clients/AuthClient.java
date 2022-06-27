@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "${auth.feign.name}")
-//@LoadBalancerClient(name = "${auth.feign.name}", configuration = LoadBalancerConfiguration.class)
 public interface AuthClient {
 
     @GetMapping(value="/auth/validate")

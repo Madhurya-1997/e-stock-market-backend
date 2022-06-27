@@ -1,10 +1,8 @@
 package com.heritage.company.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.heritage.company.config.CompanyServiceConfig;
-import com.heritage.company.models.CompanyProperties;
+import com.heritage.company.models.CompanyDetails;
 import com.heritage.company.models.CompanyRequest;
 import com.heritage.company.models.Company;
 import com.heritage.company.services.CompanyService;
@@ -14,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -88,7 +87,7 @@ public class CompanyController {
         return companyService.addNewCompany(traceID, token, company);
     }
 
-    @Operation(summary = "Find a Company based on Company code")
+    @Operation(summary = "Find a Company with all its stocks based on Company code")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "Found the Company details",
@@ -99,8 +98,8 @@ public class CompanyController {
     })
     @GetMapping("/info/{code}")
     @Timed(value = "findCompany.time", description = "Time taken to find company based on company code")
-    public Company findCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                               @PathVariable ( value = "code") String code) {
+    public CompanyDetails findCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                      @PathVariable ( value = "code") String code) {
         return companyService.getCompanyFromCode(traceID, code);
     }
 

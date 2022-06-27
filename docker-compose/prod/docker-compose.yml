@@ -1,0 +1,119 @@
+version: "3.8"
+
+services:
+
+  config-server:
+    image: heritage/config-server:latest
+    mem_limit: 700m
+    ports:
+      - "8888:8888"
+    networks:
+      - heritage
+
+  discovery-server:
+    image: heritage/discovery-server:latest
+    mem_limit: 700m
+    ports:
+      - "8761:8761"
+    networks:
+      - heritage
+    depends_on:
+      - config-server
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+
+  company-service:
+    image: heritage/company-service:latest
+    mem_limit: 700m
+    ports:
+      - "8080:8080"
+    networks:
+      - heritage
+    depends_on:
+      - config-server
+      - discovery-server
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+
+  auth-service:
+    image: heritage/auth-service:latest
+    mem_limit: 700m
+    ports:
+      - "9090:9090"
+    networks:
+      - heritage
+    depends_on:
+      - config-server
+      - discovery-server
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+
+  stock-service:
+    image: heritage/stock-service:latest
+    mem_limit: 700m
+    ports:
+      - "7070:7070"
+    networks:
+      - heritage
+    depends_on:
+      - config-server
+      - discovery-server
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+
+  api-gateway:
+    image: heritage/api-gateway:latest
+    mem_limit: 700m
+    ports:
+      - "1000:1000"
+    networks:
+      - heritage
+    depends_on:
+      - config-server
+      - discovery-server
+      - stock-service
+      - company-service
+      - auth-service
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 45s
+        max_attempts: 3
+        window: 180s
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+networks:
+  heritage:

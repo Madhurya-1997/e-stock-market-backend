@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "${company.feign.name}")
-//@LoadBalancerClient(name = "${company.feign.name}", configuration = LoadBalancerConfiguration.class)
 public interface CompanyClient {
     @GetMapping("/company/info/{code}")
     public Company findCompany(@RequestHeader("e-stock-market-trace-id") String traceID,

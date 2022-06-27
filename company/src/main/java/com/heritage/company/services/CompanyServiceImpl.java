@@ -5,21 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.heritage.company.clients.AuthClient;
 import com.heritage.company.clients.AuthResponse;
+import com.heritage.company.clients.StockClient;
 import com.heritage.company.config.CompanyServiceConfig;
 import com.heritage.company.exceptions.*;
-import com.heritage.company.models.Company;
-import com.heritage.company.models.CompanyFallback;
-import com.heritage.company.models.CompanyProperties;
-import com.heritage.company.models.CompanyRequest;
+import com.heritage.company.models.*;
 import com.heritage.company.repositories.CompanyRepository;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +32,9 @@ public class CompanyServiceImpl implements CompanyService{
     private AuthClient authClient;
 
     @Autowired
+    private StockClient stockClient;
+
+    @Autowired
     private CompanyRepository companyRepository;
 
     @Autowired
@@ -42,13 +43,17 @@ public class CompanyServiceImpl implements CompanyService{
     @Override
     public List<Company> getAllCompanies(String traceID) {
         log.debug("Invoking getAllCompanies service with trace ID: " + traceID);
+
+
+        // fetch only the latest stock created for each company
+
+
+
         return companyRepository.findAll();
     }
 
-
-//    @Retry(name = "retryAddNewCompanyFallback", fallbackMethod = "addNewCompanyFallback")
-//    @CircuitBreaker(name = "addNewCompanyCircuitBreaker", fallbackMethod = "addNewCompanyFallback")
     @Override
+    @Retry(name = "retryInvokeAuthServiceClient", fallbackMethod = "invokeAuthServiceClientFallback")
     public Company addNewCompany(String traceID, String token, CompanyRequest company) {
 
         log.debug("Invoking addNewCompany service with trace ID: " + traceID);
@@ -59,13 +64,6 @@ public class CompanyServiceImpl implements CompanyService{
         AuthResponse authResponse = invokeAuthServiceClient(traceID, token);
         log.debug("Existing user is: " + authResponse.getUsername() + " with trace ID: " + traceID);
 
-//        AuthResponse authResponse = null;
-//
-//        try {
-//            authResponse = authClient.verifyUser(token);
-//        } catch(Exception e) {
-//            throw new UserTokenExpiredException();
-//        }
         if (authResponse == null) {
             throw new UserNotFoundException();
         }
@@ -87,18 +85,24 @@ public class CompanyServiceImpl implements CompanyService{
 
 
     @Override
-    public Company getCompanyFromCode(String traceID, String code) {
+    public CompanyDetails getCompanyFromCode(String traceID, String code ) {
         log.debug("Invoking getCompanyFromCode service with trace ID: " + traceID);
 
         Optional<Company> existingCompany = companyRepository.findByCode(code);
 
+        // get all stock details for this company
+        List<Stock> stockList = stockClient.getListOfStocksForCompany(traceID, code);
+        CompanyDetails companyDetails = new CompanyDetails(existingCompany.get(), stockList);
+
+
         if (existingCompany.isEmpty()) {
             throw new CompanyNotFoundException();
         }
-        return existingCompany.get();
+        return companyDetails;
     }
 
     @Override
+    @Retry(name = "retryInvokeStockServiceClient", fallbackMethod = "invokeStockServiceClientFallback")
     public void deleteCompany(String traceID, String token, String code) {
 
         log.debug("Invoking deleteCompany service with trace ID: " + traceID);
@@ -108,6 +112,9 @@ public class CompanyServiceImpl implements CompanyService{
 
         AuthResponse authResponse = invokeAuthServiceClient(traceID, token);
         log.debug("Existing user is: " + authResponse.getUsername() + " with trace ID: " + traceID);
+
+        String deletedStocks = invokeStockServiceClient(traceID, token, code);
+        log.debug("Message from stock client after deletion: " + deletedStocks);
 
 
         if (authResponse == null) {
@@ -135,15 +142,37 @@ public class CompanyServiceImpl implements CompanyService{
     }
 
 
-    @Retry(name = "retryAddNewCompanyFallback", fallbackMethod = "addNewCompanyFallback")
+    /**
+     * Handling Auth client failure
+     * @param traceID
+     * @param token
+     * @return
+     */
     private AuthResponse invokeAuthServiceClient(String traceID, String token) {
-       return authClient.verifyUser(traceID, token);
+        return authClient.verifyUser(traceID, token);
     }
 
-    private Company addNewCompanyFallback(String token, CompanyRequest company, Throwable t) {
+    private Company invokeAuthServiceClientFallback(String traceID, String token, CompanyRequest company, Throwable t) {
         Company fallbackCompany = new Company();
-        fallbackCompany.setFallbackMessage("Authentication service is not responding or user token has expired. Please try again later !!");
+        fallbackCompany.setFallbackMessage("Authentication service is not responding or user token has expired. Please try again later !! Trace ID: " + traceID);
         return fallbackCompany;
     }
 
+
+    /**
+     * Handling Stock service client failure
+     * @param traceID
+     * @param token
+     * @param companyCode
+     * @return
+     */
+    private String invokeStockServiceClient(String traceID, String token, String companyCode) {
+        return stockClient.deleteAllStocksForCompany(traceID, token, companyCode);
+    }
+
+    private Company invokeStockServiceClientFallback(String traceID, String token, String code, Throwable t) {
+        Company fallbackCompany = new Company();
+        fallbackCompany.setFallbackMessage("Stock service is not responding. Please try again later !!");
+        return fallbackCompany;
+    }
 }
