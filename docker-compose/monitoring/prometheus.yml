@@ -1,0 +1,16 @@
+global:
+  scrape_interval:     3s # Set the scrape interval to every 3 seconds.
+  evaluation_interval: 3s # Evaluate rules every 3 seconds.
+scrape_configs:
+  - job_name: 'company-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+    - targets: ['company-service:8080']
+  - job_name: 'auth-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+    - targets: ['auth-service:8090']
+  - job_name: 'stock-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+    - targets: ['stock-service:8070']

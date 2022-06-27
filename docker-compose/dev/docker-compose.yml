@@ -2,6 +2,14 @@ version: "3.8"
 
 services:
 
+  zipkin:
+    image: openzipkin/zipkin
+    mem_limit: 700m
+    ports:
+      - "9411:9411"
+    networks:
+      - heritage
+
   config-server:
     image: heritage/config-server:latest
     mem_limit: 700m
@@ -27,7 +35,15 @@ services:
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+
+  company_mongo_db:
+    image: mongo:latest
+    container_name: company_mongo_db
+    restart: always
+    ports:
+      - 27017:27017
 
   company-service:
     image: heritage/company-service:latest
@@ -39,6 +55,7 @@ services:
     depends_on:
       - config-server
       - discovery-server
+      - company_mongo_db
     deploy:
       restart_policy:
         condition: on-failure
@@ -47,8 +64,16 @@ services:
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+
+  auth_mongo_db:
+    image: mongo:latest
+    container_name: auth_mongo_db
+    restart: always
+    ports:
+      - 27027:27017
 
   auth-service:
     image: heritage/auth-service:latest
@@ -60,6 +85,7 @@ services:
     depends_on:
       - config-server
       - discovery-server
+      - auth_mongo_db
     deploy:
       restart_policy:
         condition: on-failure
@@ -68,8 +94,16 @@ services:
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+
+  stock_mongo_db:
+    image: mongo:latest
+    container_name: stock_mongo_db
+    restart: always
+    ports:
+      - 27037:27017
 
   stock-service:
     image: heritage/stock-service:latest
@@ -81,6 +115,7 @@ services:
     depends_on:
       - config-server
       - discovery-server
+      - stock_mongo_db
     deploy:
       restart_policy:
         condition: on-failure
@@ -89,8 +124,9 @@ services:
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 
   api-gateway:
     image: heritage/api-gateway:latest
@@ -112,8 +148,10 @@ services:
         max_attempts: 3
         window: 180s
     environment:
-      SPRING_PROFILES_ACTIVE: default
-      SPRING_CONFIG_IMPORT: config-server:http://config-server:8888/
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
+
 networks:
   heritage:

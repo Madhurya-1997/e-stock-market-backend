@@ -2,6 +2,54 @@ version: "3.8"
 
 services:
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    ports:
+      - "9200:9200"
+    environment:
+      - "discovery.type=single-node"
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data:rw # Persistence data
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.2.0
+    ports:
+      - "25826:25826"
+      - "5044:5044"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro # Pipeline configuration
+    restart: on-failure
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.2.0
+    ports:
+      - "5601:5601"
+    restart: on-failure
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.2.0
+    volumes:
+      - ./filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro # Docker logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Additional information about containers
+      - ./filebeat/data:/usr/share/filebeat/data:rw # Persistence data
+    user: root # Allow access to log files and docker.sock
+    restart: on-failure
+    depends_on:
+      - logstash
+
+  zipkin:
+    image: openzipkin/zipkin
+    mem_limit: 700m
+    ports:
+      - "9411:9411"
+    networks:
+      - heritage
+
   config-server:
     image: heritage/config-server:latest
     mem_limit: 700m
@@ -28,6 +76,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 
   company_mongo_db:
     image: mongo:latest
@@ -53,10 +102,14 @@ services:
         delay: 30s
         max_attempts: 3
         window: 120s
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 
   auth_mongo_db:
     image: mongo:latest
@@ -82,10 +135,14 @@ services:
         delay: 30s
         max_attempts: 3
         window: 120s
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 
   stock_mongo_db:
     image: mongo:latest
@@ -111,10 +168,14 @@ services:
         delay: 30s
         max_attempts: 3
         window: 120s
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 
   api-gateway:
     image: heritage/api-gateway:latest
@@ -139,6 +200,7 @@ services:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_ZIPKIN_BASEURL: http://zipkin:9411/
 
 networks:
   heritage:
