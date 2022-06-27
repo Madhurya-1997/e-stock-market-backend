@@ -9,4 +9,6 @@
   <li>Log Tracing using Response and Tracing filter with API gateway</li>
   <li>ELK stack for log aggregation</li>
   <li>Docker to containerize all services</li>
+  <li>Swagger UI for Documentation of all microservices</li>
 </ul>
+
