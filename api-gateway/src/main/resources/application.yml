@@ -8,6 +8,17 @@ spring:
     name: api-gateway-service
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedHeaders:
+              - "*"
+            allowedOrigins: "*"
+            allowedMethods:
+              - POST
+              - DELETE
+              - GET
+              - PUT
       discovery:
         locator:
           enabled: true
@@ -50,3 +61,6 @@ eureka:
   instance:
     prefer-ip-address: true
     lease-renewal-interval-in-seconds: 10
+
+
+

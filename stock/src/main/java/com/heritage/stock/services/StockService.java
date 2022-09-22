@@ -22,5 +22,6 @@ public interface StockService {
                                                                String companyCode,
                                                                String startDate,
                                                                String endDate) throws ParseException;
+    public Page<Stock> getListOfStocksWithinTimeSpan(String traceID, Pageable pageable, String startDate, String endDate) throws ParseException;
     public void deleteAllStocksForCompany(String traceID, String token, String companyCode);
 }

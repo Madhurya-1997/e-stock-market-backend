@@ -87,9 +87,18 @@ public class StockServiceImpl implements StockService{
                 new SimpleDateFormat("dd-MM-yyyy").parse(endDate));
     }
 
+    @Override
+    public Page<Stock> getListOfStocksWithinTimeSpan(String traceID, Pageable pageable, String startDate, String endDate) throws ParseException {
+        logger.debug("Invoking getListOfStocksForCompanyWithinTimeSpan service with trace ID: " + traceID);
+
+        return stockRepository.findAllByCreatedAtBetween(pageable,
+                new SimpleDateFormat("dd-MM-yyyy").parse(startDate),
+                new SimpleDateFormat("dd-MM-yyyy").parse(endDate));
+    }
+
 
     @Override
-    @Retry(name = "retryDeleteAllStocksForCompany", fallbackMethod = "deleteAllStocksForCompanyFallback")
+//    @Retry(name = "retryDeleteAllStocksForCompany", fallbackMethod = "deleteAllStocksForCompanyFallback")
     public void deleteAllStocksForCompany(String traceID, String token, String companyCode) {
         logger.debug("Invoking deleteAllStocksForCompany service with trace ID: " + traceID);
         AuthResponse authResponse = authClient.verifyUser(traceID, token);

@@ -104,6 +104,25 @@ public class StockController {
         return stockService.getListOfStocksForCompanyWithinTimeSpan(traceID, pageable, companyCode, startDate, endDate);
     }
 
+    @Operation(summary = "Fetch a list of Stocks within a time span")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Stock list fetched for within the mentioned time span",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad Company request Schema",
+                    content = @Content),
+            @ApiResponse(responseCode = "404",
+                    description = "Resource not available",
+                    content = @Content)
+    })
+    @GetMapping("/get/{startDate}/{endDate}")
+    public Page<Stock> getListOfStocksWithinTimeSpan(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                                               Pageable pageable,
+                                                               @PathVariable("startDate")String startDate,
+                                                               @PathVariable("endDate")String endDate) throws ParseException {
+        return stockService.getListOfStocksWithinTimeSpan(traceID, pageable, startDate, endDate);
+    }
 
     @Operation(summary = "Delete all Stocks for a company")
     @ApiResponses(value = {

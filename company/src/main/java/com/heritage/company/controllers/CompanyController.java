@@ -56,7 +56,7 @@ public class CompanyController {
     })
     @GetMapping("/getall")
     @Timed(value = "findAllCompanies.time", description = "Time taken to return all company details")
-    public List<Company> findAllCompanies(@RequestHeader("e-stock-market-trace-id") String traceID) {
+    public List<CompanyDetails> findAllCompanies(@RequestHeader("e-stock-market-trace-id") String traceID) {
         return companyService.getAllCompanies(traceID);
     }
 

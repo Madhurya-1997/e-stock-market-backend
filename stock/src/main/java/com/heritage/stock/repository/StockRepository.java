@@ -20,5 +20,7 @@ public interface StockRepository extends MongoRepository<Stock, String> {
 //    Page<Stock> findAllByCompanyCodeAndDateBetween(Pageable pageable, String companyCode, Date startDate, Date endDate);
     Page<Stock> findAllByCompanyCodeAndCreatedAtBetween(Pageable pageable, String companyCode, Date startDate, Date endDate);
 
+    Page<Stock> findAllByCreatedAtBetween(Pageable pageable, Date startDate, Date endDate);
+
     void deleteAllByCompanyCode(String companyCode);
 }

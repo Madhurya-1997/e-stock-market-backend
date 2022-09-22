@@ -69,7 +69,7 @@ public class AuthController {
                     description = "Resource not available",
                     content = @Content)
     })
-    @GetMapping("/authenticate")
+    @PostMapping("/authenticate")
     public ResponseEntity<AuthResponse> createAuthenticationToken(@RequestHeader("e-stock-market-trace-id") String traceID,
                                                                   @RequestBody AuthRequest req) throws Exception {
 

@@ -6,11 +6,13 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.Date;
 
 @SpringBootApplication
 @EnableEurekaClient
+@CrossOrigin
 public class ApiGatewayApplication {
 
 	public static void main(String[] args) {

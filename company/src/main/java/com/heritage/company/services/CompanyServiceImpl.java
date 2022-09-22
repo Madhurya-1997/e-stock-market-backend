@@ -11,6 +11,7 @@ import com.heritage.company.exceptions.*;
 import com.heritage.company.models.*;
 import com.heritage.company.repositories.CompanyRepository;
 import io.github.resilience4j.retry.annotation.Retry;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CompanyServiceImpl implements CompanyService{
@@ -41,19 +41,23 @@ public class CompanyServiceImpl implements CompanyService{
     private CompanyServiceConfig companyServiceConfig;
 
     @Override
-    public List<Company> getAllCompanies(String traceID) {
+    public List<CompanyDetails> getAllCompanies(String traceID) {
         log.debug("Invoking getAllCompanies service with trace ID: " + traceID);
 
 
         // fetch only the latest stock created for each company
+        List<Company> companyList = companyRepository.findAll();
+        List<CompanyDetails> details = new ArrayList<>();
+        companyList.forEach(company -> {
+            List<Stock> stockList = stockClient.getListOfStocksForCompany(traceID, company.getCode());
+            Collections.sort(stockList, Comparator.comparing(Stock::getCreatedAt));
+            details.add(new CompanyDetails(company, stockList));
+        });
 
-
-
-        return companyRepository.findAll();
+        return details;
     }
 
     @Override
-    @Retry(name = "retryInvokeAuthServiceClient", fallbackMethod = "invokeAuthServiceClientFallback")
     public Company addNewCompany(String traceID, String token, CompanyRequest company) {
 
         log.debug("Invoking addNewCompany service with trace ID: " + traceID);
@@ -102,7 +106,6 @@ public class CompanyServiceImpl implements CompanyService{
     }
 
     @Override
-    @Retry(name = "retryInvokeStockServiceClient", fallbackMethod = "invokeStockServiceClientFallback")
     public void deleteCompany(String traceID, String token, String code) {
 
         log.debug("Invoking deleteCompany service with trace ID: " + traceID);
@@ -148,6 +151,7 @@ public class CompanyServiceImpl implements CompanyService{
      * @param token
      * @return
      */
+    @Retry(name = "retryInvokeAuthServiceClient", fallbackMethod = "invokeAuthServiceClientFallback")
     private AuthResponse invokeAuthServiceClient(String traceID, String token) {
         return authClient.verifyUser(traceID, token);
     }
@@ -166,6 +170,7 @@ public class CompanyServiceImpl implements CompanyService{
      * @param companyCode
      * @return
      */
+    @Retry(name = "retryInvokeStockServiceClient", fallbackMethod = "invokeStockServiceClientFallback")
     private String invokeStockServiceClient(String traceID, String token, String companyCode) {
         return stockClient.deleteAllStocksForCompany(traceID, token, companyCode);
     }

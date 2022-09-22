@@ -141,6 +141,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>${project.artifactId}-service</finalName>
 	</build>
 
 </project>
