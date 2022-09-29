@@ -53,7 +53,6 @@ public class CompanyServiceImpl implements CompanyService{
             Collections.sort(stockList, Comparator.comparing(Stock::getCreatedAt));
             details.add(new CompanyDetails(company, stockList));
         });
-
         return details;
     }
 
