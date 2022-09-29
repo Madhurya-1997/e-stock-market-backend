@@ -28,7 +28,7 @@ public class CompanyRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        Company company1 = new Company("1", "H01", "Heritage", "H CEO", 10000000000l, "heritage.com", "NSE", "H-username");
+        Company company1 = new Company("1", "H01", "Heritage", "H CEO", 10000000000l, "heritage.com", "NSE");
         companyRepository.save(company1);
     }
 

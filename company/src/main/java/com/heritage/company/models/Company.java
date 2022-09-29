@@ -43,12 +43,4 @@ public class Company extends AuditModel{
     @Field(name = "enlisted_stock_exchange")
     @NotNull(message = "Company website cannot be null")
     private String stockExchangeEnlisted;
-
-    @Field(name = "username")
-    @NotNull(message = "Username cannot be null")
-    private String username;
-
 }
-
-
-//

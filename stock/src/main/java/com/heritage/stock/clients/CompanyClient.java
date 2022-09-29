@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "${company.feign.name}")
+//@FeignClient(name = "${company.feign.name}")
 public interface CompanyClient {
-    @GetMapping("/company/info/{code}")
-    public Company findCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                               @PathVariable("code") String code);
+//    @GetMapping("/company/info/{code}")
+//    public Company findCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+//                               @PathVariable("code") String code);
 }

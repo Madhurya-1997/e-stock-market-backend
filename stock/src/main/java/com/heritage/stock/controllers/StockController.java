@@ -1,6 +1,7 @@
 package com.heritage.stock.controllers;
 
 import com.heritage.stock.models.Stock;
+import com.heritage.stock.models.StockRequest;
 import com.heritage.stock.services.StockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -47,20 +48,13 @@ public class StockController {
                     content = @Content),
             @ApiResponse(responseCode = "404",
                     description = "Resource not available",
-                    content = @Content),
-            @ApiResponse(responseCode = "401",
-                    description = "Unauthorized to add new stock",
-                    content = @Content),
-            @ApiResponse(responseCode = "403",
-                    description = "Unauthorized to add new stock",
                     content = @Content)
     })
     @PostMapping("/add/{companyCode}")
     public Stock addNewStock(@RequestHeader("e-stock-market-trace-id") String traceID,
-                             @RequestHeader("Authorization") String token,
                              @PathVariable("companyCode")String companyCode,
-                             @RequestBody Stock stock){
-        return stockService.addNewStock(traceID, token, companyCode, stock);
+                             @RequestBody StockRequest stock){
+        return stockService.addNewStock(traceID, companyCode, stock);
     }
 
 
@@ -76,7 +70,7 @@ public class StockController {
                     description = "Resource not available",
                     content = @Content)
     })
-    @GetMapping("/get/{companyCode}")
+        @GetMapping("/get/{companyCode}")
     public List<Stock> getListOfStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
                                                  Pageable pageable,
                                                  @PathVariable("companyCode")String companyCode){
@@ -134,20 +128,13 @@ public class StockController {
                     content = @Content),
             @ApiResponse(responseCode = "404",
                     description = "Resource not available",
-                    content = @Content),
-            @ApiResponse(responseCode = "401",
-                    description = "Unauthorized to delete stocks",
-                    content = @Content),
-            @ApiResponse(responseCode = "403",
-                    description = "Unauthorized to delete stocks",
                     content = @Content)
     })
     @DeleteMapping("/delete/{companyCode}/")
     public String deleteAllStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                              @RequestHeader("Authorization") String token,
                               @PathVariable("companyCode") String companyCode) {
 
-        stockService.deleteAllStocksForCompany(traceID, token, companyCode);
+        stockService.deleteAllStocksForCompany(traceID, companyCode);
 
         return "All stocks deleted successfully for company: " + companyCode;
     }

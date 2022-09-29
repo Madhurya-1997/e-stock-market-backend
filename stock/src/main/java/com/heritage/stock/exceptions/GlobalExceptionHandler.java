@@ -67,8 +67,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         response.sendError(HttpStatus.FORBIDDEN.value(), "Cannot access this page");
     }
 
-    @ExceptionHandler(UserTokenExpiredException.class)
-    public void  springUserTokenExpiredHandleIssue(HttpServletResponse response) throws IOException{
-        response.sendError(HttpStatus.UNAUTHORIZED.value(), "User token expired. Please login again!");
+    @ExceptionHandler(CompanyCodeMismatchException.class)
+    public void  springCompanyCodeMismatchAllowedHandleIssue(HttpServletResponse response) throws IOException{
+        response.sendError(HttpStatus.FORBIDDEN.value(), "Company codes mismatch !!");
     }
 }

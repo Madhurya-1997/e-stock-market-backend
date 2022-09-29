@@ -7,11 +7,11 @@ import org.springframework.context.annotation.Bean;
 
 @Slf4j
 public class LoadBalancerConfiguration {
-    @Bean
-    public ServiceInstanceListSupplier discoveryClientServiceInstanceListSupplier(ConfigurableApplicationContext context) {
-        return ServiceInstanceListSupplier.builder()
-                .withBlockingDiscoveryClient()
-                .withSameInstancePreference()
-                .build(context);
-    }
+//    @Bean
+//    public ServiceInstanceListSupplier discoveryClientServiceInstanceListSupplier(ConfigurableApplicationContext context) {
+//        return ServiceInstanceListSupplier.builder()
+//                .withBlockingDiscoveryClient()
+//                .withSameInstancePreference()
+//                .build(context);
+//    }
 }

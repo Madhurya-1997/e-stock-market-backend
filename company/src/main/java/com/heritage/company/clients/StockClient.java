@@ -19,6 +19,5 @@ public interface StockClient {
                                                  @PathVariable("companyCode")String companyCode);
     @DeleteMapping("/stock/delete/{companyCode}/")
     public String deleteAllStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                            @RequestHeader("Authorization") String token,
                                             @PathVariable("companyCode") String companyCode);
 }
