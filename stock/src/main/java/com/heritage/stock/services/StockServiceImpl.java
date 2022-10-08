@@ -95,10 +95,10 @@ public class StockServiceImpl implements StockService{
         stockRepository.deleteAllByCompanyCode(companyCode);
     }
 
-    private Date addHoursToJavaUtilDate(Date date, Integer hours) {
+    private Date addHoursToJavaUtilDate(Date date, Integer duration) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        calendar.add(Calendar.HOUR_OF_DAY, hours);
+        calendar.add(Calendar.DATE, duration);
         return calendar.getTime();
     }
 
