@@ -52,16 +52,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         response.sendError(HttpStatus.BAD_REQUEST.value(), "Arguments mismatched...");
     }
 
-    @ExceptionHandler(CompanyNotFoundException.class)
-    public void  springCompanyHandleIssue(HttpServletResponse response) throws IOException{
-        response.sendError(HttpStatus.NOT_FOUND.value(), "Company not found");
-    }
-
-    @ExceptionHandler(CompanyAlreadyExistsException.class)
-    public void  springUserExistsHandleIssue(HttpServletResponse response) throws IOException{
-        response.sendError(HttpStatus.BAD_REQUEST.value(), "Company code already exists");
-    }
-
     @ExceptionHandler(NotAllowedException.class)
     public void  springNotAllowedHandleIssue(HttpServletResponse response) throws IOException{
         response.sendError(HttpStatus.FORBIDDEN.value(), "Cannot access this page");

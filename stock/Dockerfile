@@ -5,7 +5,7 @@ FROM openjdk:15-slim as build
 MAINTAINER heritage.com
 
 # Add the application's jar to the container
-COPY target/stock-0.0.1-SNAPSHOT.jar stock-0.0.1-SNAPSHOT.jar
+COPY target/stock.jar stock.jar
 
 #execute the application
-ENTRYPOINT ["java","-jar","/stock-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","/stock.jar"]

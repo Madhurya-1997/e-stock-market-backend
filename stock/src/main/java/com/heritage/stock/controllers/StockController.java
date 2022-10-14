@@ -70,7 +70,7 @@ public class StockController {
                     description = "Resource not available",
                     content = @Content)
     })
-        @GetMapping("/get/{companyCode}")
+    @GetMapping("/get/{companyCode}")
     public List<Stock> getListOfStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
                                                  Pageable pageable,
                                                  @PathVariable("companyCode")String companyCode){
@@ -90,7 +90,7 @@ public class StockController {
                     content = @Content)
     })
     @GetMapping("/get/{companyCode}/{startDate}/{endDate}")
-    public Page<Stock> getListOfStocksForCompanyWithinTimeSpan(@RequestHeader("e-stock-market-trace-id") String traceID,
+    public List<Stock> getListOfStocksForCompanyWithinTimeSpan(@RequestHeader("e-stock-market-trace-id") String traceID,
                                                                Pageable pageable,
                                                                @PathVariable("companyCode")String companyCode,
                                                                @PathVariable("startDate")String startDate,
@@ -111,8 +111,8 @@ public class StockController {
                     content = @Content)
     })
     @GetMapping("/get/{startDate}/{endDate}")
-    public Page<Stock> getListOfStocksWithinTimeSpan(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                                               Pageable pageable,
+    public List<Stock> getListOfStocksWithinTimeSpan(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                                     Pageable pageable,
                                                                @PathVariable("startDate")String startDate,
                                                                @PathVariable("endDate")String endDate) throws ParseException {
         return stockService.getListOfStocksWithinTimeSpan(traceID, pageable, startDate, endDate);
@@ -130,12 +130,10 @@ public class StockController {
                     description = "Resource not available",
                     content = @Content)
     })
-    @DeleteMapping("/delete/{companyCode}/")
-    public String deleteAllStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                              @PathVariable("companyCode") String companyCode) {
+    @DeleteMapping("/delete/{companyCode}")
+    public void deleteAllStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+                                          @PathVariable("companyCode") String companyCode) {
 
         stockService.deleteAllStocksForCompany(traceID, companyCode);
-
-        return "All stocks deleted successfully for company: " + companyCode;
     }
 }

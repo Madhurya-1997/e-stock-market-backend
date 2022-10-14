@@ -48,12 +48,16 @@ logging:
   pattern:
     console: "%d{dd-MM-yy} %d{HH:mm:ss.SSS} %-20.20thread %5p %-25.25logger{25} %25M %4L %m%n"
 
-
+market:
+  company:
+    uri: "http://company-lb-301192563.ap-south-1.elb.amazonaws.com/"
+  stock:
+    uri: "http://stock-lb-1031691086.ap-south-1.elb.amazonaws.com/"
 
 eureka:
   client:
     service-url:
-      default-zone: ${EUREKA_URI:http://localhost:8761/eureka}
+      defaultZone: "http://eureka-lb-1554815189.ap-south-1.elb.amazonaws.com/eureka/"
     register-with-eureka: true
     fetch-registry: true
     healthcheck:

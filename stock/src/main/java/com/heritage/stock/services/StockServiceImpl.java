@@ -39,7 +39,7 @@ public class StockServiceImpl implements StockService{
 //    @Retry(name = "retryAddNewStock", fallbackMethod = "addNewStockFallback")
     public Stock addNewStock(String traceID, String companyCode, StockRequest stock) {
 
-        logger.debug("Invoking addNewStock service with trace ID: " + traceID);
+        logger.debug("Invoking addNewStock service");
 
 //        Company company = companyClient.findCompany(traceID, companyCode);
 //        logger.debug("Existing company is: " + company + " with trace ID: " + traceID);
@@ -61,15 +61,15 @@ public class StockServiceImpl implements StockService{
 
     @Override
     public List<Stock> getListOfStocksForCompany(String traceID, Pageable pageable, String companyCode) {
-        logger.debug("Invoking getListOfStocksForCompany service with trace ID: " + traceID);
+        logger.debug("Invoking getListOfStocksForCompany service");
 
         List<Stock> stocks = stockRepository.findAllByCompanyCode(companyCode);
         return stockRepository.findAllByCompanyCode(companyCode);
     }
 
     @Override
-    public Page<Stock> getListOfStocksForCompanyWithinTimeSpan(String traceID, Pageable pageable, String companyCode, String startDate, String endDate) throws ParseException {
-        logger.debug("Invoking getListOfStocksForCompanyWithinTimeSpan service with trace ID: " + traceID);
+    public List<Stock> getListOfStocksForCompanyWithinTimeSpan(String traceID, Pageable pageable, String companyCode, String startDate, String endDate) throws ParseException {
+        logger.debug("Invoking getListOfStocksForCompanyWithinTimeSpan service");
 
         return stockRepository.findAllByCompanyCodeAndCreatedAtBetween(pageable,
                 companyCode,
@@ -78,8 +78,8 @@ public class StockServiceImpl implements StockService{
     }
 
     @Override
-    public Page<Stock> getListOfStocksWithinTimeSpan(String traceID, Pageable pageable, String startDate, String endDate) throws ParseException {
-        logger.debug("Invoking getListOfStocksForCompanyWithinTimeSpan service with trace ID: " + traceID);
+    public List<Stock> getListOfStocksWithinTimeSpan(String traceID, Pageable pageable, String startDate, String endDate) throws ParseException {
+        logger.debug("Invoking getListOfStocksForCompanyWithinTimeSpan service");
 
         return stockRepository.findAllByCreatedAtBetween(pageable,
                 new SimpleDateFormat("dd-MM-yyyy").parse(startDate),
@@ -90,7 +90,7 @@ public class StockServiceImpl implements StockService{
     @Override
 //    @Retry(name = "retryDeleteAllStocksForCompany", fallbackMethod = "deleteAllStocksForCompanyFallback")
     public void deleteAllStocksForCompany(String traceID, String companyCode) {
-        logger.debug("Invoking deleteAllStocksForCompany service with trace ID: " + traceID);
+        logger.debug("Invoking deleteAllStocksForCompany service");
 
         stockRepository.deleteAllByCompanyCode(companyCode);
     }

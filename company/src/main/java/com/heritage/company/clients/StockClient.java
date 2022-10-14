@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
-@FeignClient(name = "${stock.feign.name}")
+//@FeignClient(name = "${stock.feign.name}")
 public interface StockClient {
-
-    @GetMapping("/stock/get/{companyCode}")
-    public List<Stock> getListOfStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                                 @PathVariable("companyCode")String companyCode);
-    @DeleteMapping("/stock/delete/{companyCode}/")
-    public String deleteAllStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                            @PathVariable("companyCode") String companyCode);
+//
+//    @GetMapping("/stock/get/{companyCode}")
+//    public List<Stock> getListOfStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+//                                                 @PathVariable("companyCode")String companyCode);
+//    @DeleteMapping("/stock/delete/{companyCode}/")
+//    public String deleteAllStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
+//                                            @PathVariable("companyCode") String companyCode);
 }

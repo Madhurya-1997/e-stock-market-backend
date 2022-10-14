@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.heritage.company.clients.StockClient;
 import com.heritage.company.config.CompanyServiceConfig;
+import com.heritage.company.config.RestServiceConfig;
 import com.heritage.company.exceptions.*;
 import com.heritage.company.models.*;
 import com.heritage.company.repositories.CompanyRepository;
@@ -12,17 +13,26 @@ import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyServiceImpl implements CompanyService{
 
     private static final Logger log = LoggerFactory.getLogger(CompanyServiceImpl.class);
 
-    @Autowired
-    private StockClient stockClient;
+//    @Autowired
+//    private StockClient stockClient;
 
     @Autowired
     private CompanyRepository companyRepository;
@@ -30,16 +40,25 @@ public class CompanyServiceImpl implements CompanyService{
     @Autowired
     private CompanyServiceConfig companyServiceConfig;
 
+
+    @Value("${stock-uri}")
+    private String STOCK_URI;
+
     @Override
     public List<CompanyDetails> getAllCompanies(String traceID) {
-        log.debug("Invoking getAllCompanies service with trace ID: " + traceID);
-
+        log.debug("Invoking getAllCompanies service");
         // fetch only the latest stock created for each company
         List<Company> companyList = companyRepository.findAll();
         List<CompanyDetails> details = new ArrayList<>();
+
         companyList.forEach(company -> {
-            List<Stock> stockList = stockClient.getListOfStocksForCompany(traceID, company.getCode());
-            Collections.sort(stockList, Comparator.comparing(Stock::getCreatedAt));
+            ResponseEntity<List<Stock>> stocks =
+                    RestServiceConfig.getRestTemplate(traceID).exchange(STOCK_URI + "get/" + company.getCode(),
+                            HttpMethod.GET, null, new ParameterizedTypeReference<List<Stock>>() {
+                            });
+
+            List<Stock> stockList = stocks.getBody();
+            Collections.sort(stockList, (stock1, stock2) -> stock2.getCreatedAt().compareTo(stock1.getCreatedAt()));
             details.add(new CompanyDetails(company, stockList));
         });
         return details;
@@ -47,14 +66,13 @@ public class CompanyServiceImpl implements CompanyService{
 
     @Override
     public Company addNewCompany(String traceID, Company company) {
-
-        log.debug("Invoking addNewCompany service with trace ID: " + traceID);
+        log.debug("Invoking addNewCompany service");
 
         Optional<Company> existingCompany = companyRepository.findByCode(company.getCode());
-        log.debug("Existing company is: " + existingCompany + " with trace ID: " + traceID);
+        log.debug("Existing company is: " + existingCompany);
 
         if (existingCompany.isPresent()) {
-            throw new CompanyAlreadyExistsException();
+            throw new CompanyAlreadyExistsException("Company code already exists");
         }
         return companyRepository.save(company);
     }
@@ -62,31 +80,36 @@ public class CompanyServiceImpl implements CompanyService{
 
     @Override
     public CompanyDetails getCompanyFromCode(String traceID, String code ) {
-        log.debug("Invoking getCompanyFromCode service with trace ID: " + traceID);
+        log.debug("Invoking getCompanyFromCode service");
 
         Optional<Company> existingCompany = companyRepository.findByCode(code);
-
-        // get all stock details for this company
-        List<Stock> stockList = stockClient.getListOfStocksForCompany(traceID, code);
-        CompanyDetails companyDetails = new CompanyDetails(existingCompany.get(), stockList);
-
-
         if (existingCompany.isEmpty()) {
             throw new CompanyNotFoundException();
         }
+        // get all stock details for this company
+        ResponseEntity<List<Stock>> stocks =
+                RestServiceConfig.getRestTemplate(traceID).exchange(STOCK_URI + "get/" + code,
+                        HttpMethod.GET, null, new ParameterizedTypeReference<List<Stock>>() {
+                        });
+        List<Stock> stockList = stocks.getBody();
+        CompanyDetails companyDetails = new CompanyDetails(existingCompany.get(), stockList);
+
+        Collections.sort(stockList, (s1, s2) -> s2.getCreatedAt().compareTo(s1.getCreatedAt()));
+
+
         return companyDetails;
     }
 
     @Override
     public void deleteCompany(String traceID, String code) {
 
-        log.debug("Invoking deleteCompany service with trace ID: " + traceID);
+        log.debug("Invoking deleteCompany service");
 
         Optional<Company> existingCompany = companyRepository.findByCode(code);
-        log.debug("Existing company is: " + existingCompany + " with trace ID: " + traceID);
+        log.debug("Existing company is: " + existingCompany);
 
-        String deletedStocks = invokeStockServiceClient(traceID, code);
-        log.debug("Message from stock client after deletion: " + deletedStocks);
+        invokeStockServiceClient(traceID, code);
+
         if (existingCompany.isEmpty()) {
            throw new CompanyNotFoundException();
         }
@@ -106,13 +129,13 @@ public class CompanyServiceImpl implements CompanyService{
 
     /**
      * Handling Stock service client failure
-     * @param traceID
      * @param companyCode
      * @return
      */
     @Retry(name = "retryInvokeStockServiceClient", fallbackMethod = "invokeStockServiceClientFallback")
-    private String invokeStockServiceClient(String traceID, String companyCode) {
-        return stockClient.deleteAllStocksForCompany(traceID, companyCode);
+    private void invokeStockServiceClient(String traceID, String companyCode) {
+        RestTemplate restTemplate = RestServiceConfig.getRestTemplate(traceID);
+        restTemplate.delete(STOCK_URI + "delete/" + companyCode);
     }
 
     private Company invokeStockServiceClientFallback(String traceID, String code, Throwable t) {

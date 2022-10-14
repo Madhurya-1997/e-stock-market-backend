@@ -73,8 +73,7 @@ public class CompanyController {
     })
     @PostMapping("/")
     @Timed(value = "addNewCompany.time", description = "Time taken to register a new company")
-    public Company addNewCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                 @RequestBody @Valid Company company) {
+    public Company addNewCompany(@RequestHeader("e-stock-market-trace-id") String traceID, @RequestBody @Valid Company company) {
         return companyService.addNewCompany(traceID, company);
     }
 
@@ -89,8 +88,7 @@ public class CompanyController {
     })
     @GetMapping("/info/{code}")
     @Timed(value = "findCompany.time", description = "Time taken to find company based on company code")
-    public CompanyDetails findCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                      @PathVariable ( value = "code") String code) {
+    public CompanyDetails findCompany(@RequestHeader("e-stock-market-trace-id") String traceID, @PathVariable ( value = "code") String code) {
         return companyService.getCompanyFromCode(traceID, code);
     }
 
@@ -109,8 +107,7 @@ public class CompanyController {
     })
     @DeleteMapping("/delete/{code}")
     @Timed(value = "deleteCompany.time", description = "Time taken to delete company based on company code")
-    public void deleteCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                              @PathVariable ( value = "code") String code) {
+    public void deleteCompany(@RequestHeader("e-stock-market-trace-id") String traceID, @PathVariable ( value = "code") String code) {
         companyService.deleteCompany(traceID, code);
     }
 

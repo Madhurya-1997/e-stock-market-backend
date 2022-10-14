@@ -18,9 +18,9 @@ public interface StockRepository extends MongoRepository<Stock, String> {
 
 //    @Query("{$and :[{companyCode: ?0},{endDate: {$gte: ?1, $lte: ?2}}]}")
 //    Page<Stock> findAllByCompanyCodeAndDateBetween(Pageable pageable, String companyCode, Date startDate, Date endDate);
-    Page<Stock> findAllByCompanyCodeAndCreatedAtBetween(Pageable pageable, String companyCode, Date startDate, Date endDate);
+    List<Stock> findAllByCompanyCodeAndCreatedAtBetween(Pageable pageable, String companyCode, Date startDate, Date endDate);
 
-    Page<Stock> findAllByCreatedAtBetween(Pageable pageable, Date startDate, Date endDate);
+    List<Stock> findAllByCreatedAtBetween(Pageable pageable, Date startDate, Date endDate);
 
     void deleteAllByCompanyCode(String companyCode);
 }

@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Document(collection = "company")
@@ -20,27 +21,27 @@ public class Company extends AuditModel{
     private String id;
 
     @Field(name = "code")
-    @NotNull(message = "Company code cannot be null")
+    @NotBlank(message = "Company code should be present")
     private String code;
 
     @Field(name = "name")
-    @NotNull(message = "Company name cannot be null")
+    @NotBlank(message = "Company name should be present")
     private String name ;
 
     @Field(name = "ceo")
-    @NotNull(message = "Company CEO cannot be null")
+    @NotBlank(message = "Company CEO should be present")
     private String ceo;
 
     @Field(name = "turnover")
-    @NotNull(message = "Company turnover cannot be null")
-    @Min(100000000)
+    @NotNull(message = "Company turnover cannot be empty")
+    @Min(value = 100000000, message = "Company turnover must be greater than or equal to INR 10cr.")
     private Long turnover;
 
     @Field(name = "website")
-    @NotNull(message = "Company website cannot be null")
+    @NotBlank(message = "Company website should be present")
     private String website;
 
     @Field(name = "enlisted_stock_exchange")
-    @NotNull(message = "Company website cannot be null")
+    @NotBlank(message = "Stock exchange value should be present")
     private String stockExchangeEnlisted;
 }

@@ -1,5 +1,6 @@
 package com.heritage.apigateway;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -14,6 +15,12 @@ import java.util.Date;
 @EnableEurekaClient
 @CrossOrigin
 public class ApiGatewayApplication {
+
+	@Value("${market.company.uri}")
+	private String COMPANY_URI;
+	@Value("${market.stock.uri}")
+	private String STOCK_URI;
+
 
 	public static void main(String[] args) {
 		SpringApplication.run(ApiGatewayApplication.class, args);
@@ -33,12 +40,12 @@ public class ApiGatewayApplication {
 								.filters(f -> f.rewritePath("/api/v1.0/market/company-service/(?<segment>.*)",
 										"/${segment}")
 										.addResponseHeader("X-Response-Time", new Date().toString()))
-								.uri("lb://company-service")).
+								.uri(COMPANY_URI)).
 						route(p -> p
 								.path("/api/v1.0/market/stock-service/**")
 								.filters(f -> f.rewritePath("/api/v1.0/market/stock-service/(?<segment>.*)",
 										"/${segment}")
 										.addResponseHeader("X-Response-Time", new Date().toString()))
-								.uri("lb://stock-service")).build();
+								.uri(STOCK_URI)).build();
 	}
 }
