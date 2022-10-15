@@ -11,13 +11,12 @@ import java.util.List;
 
 @Service
 public interface StockService {
-    public Stock addNewStock(String traceID, String companyCode, StockRequest stock);
-    public List<Stock> getListOfStocksForCompany(String traceID, Pageable pageable, String companyCode);
-    public List<Stock> getListOfStocksForCompanyWithinTimeSpan(String traceID,
-                                                               Pageable pageable,
+    public Stock addNewStock(String companyCode, StockRequest stock);
+    public List<Stock> getListOfStocksForCompany(Pageable pageable, String companyCode);
+    public List<Stock> getListOfStocksForCompanyWithinTimeSpan(Pageable pageable,
                                                                String companyCode,
                                                                String startDate,
                                                                String endDate) throws ParseException;
-    public List<Stock> getListOfStocksWithinTimeSpan(String traceID, Pageable pageable, String startDate, String endDate) throws ParseException;
-    public void deleteAllStocksForCompany(String traceID, String companyCode);
+    public List<Stock> getListOfStocksWithinTimeSpan(Pageable pageable, String startDate, String endDate) throws ParseException;
+    public void deleteAllStocksForCompany(String companyCode);
 }

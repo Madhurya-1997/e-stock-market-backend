@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.List;
 
@@ -51,10 +52,9 @@ public class StockController {
                     content = @Content)
     })
     @PostMapping("/add/{companyCode}")
-    public Stock addNewStock(@RequestHeader("e-stock-market-trace-id") String traceID,
-                             @PathVariable("companyCode")String companyCode,
-                             @RequestBody StockRequest stock){
-        return stockService.addNewStock(traceID, companyCode, stock);
+    public Stock addNewStock(@PathVariable("companyCode")String companyCode,
+                             @RequestBody @Valid StockRequest stock){
+        return stockService.addNewStock(companyCode, stock);
     }
 
 
@@ -71,10 +71,9 @@ public class StockController {
                     content = @Content)
     })
     @GetMapping("/get/{companyCode}")
-    public List<Stock> getListOfStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                                 Pageable pageable,
+    public List<Stock> getListOfStocksForCompany(Pageable pageable,
                                                  @PathVariable("companyCode")String companyCode){
-        return stockService.getListOfStocksForCompany(traceID, pageable, companyCode);
+        return stockService.getListOfStocksForCompany(pageable, companyCode);
     }
 
     @Operation(summary = "Fetch a list of Company Stocks for mentioned time span")
@@ -90,12 +89,11 @@ public class StockController {
                     content = @Content)
     })
     @GetMapping("/get/{companyCode}/{startDate}/{endDate}")
-    public List<Stock> getListOfStocksForCompanyWithinTimeSpan(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                                               Pageable pageable,
+    public List<Stock> getListOfStocksForCompanyWithinTimeSpan(Pageable pageable,
                                                                @PathVariable("companyCode")String companyCode,
                                                                @PathVariable("startDate")String startDate,
                                                                @PathVariable("endDate")String endDate) throws ParseException {
-        return stockService.getListOfStocksForCompanyWithinTimeSpan(traceID, pageable, companyCode, startDate, endDate);
+        return stockService.getListOfStocksForCompanyWithinTimeSpan(pageable, companyCode, startDate, endDate);
     }
 
     @Operation(summary = "Fetch a list of Stocks within a time span")
@@ -111,11 +109,10 @@ public class StockController {
                     content = @Content)
     })
     @GetMapping("/get/{startDate}/{endDate}")
-    public List<Stock> getListOfStocksWithinTimeSpan(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                                     Pageable pageable,
+    public List<Stock> getListOfStocksWithinTimeSpan(Pageable pageable,
                                                                @PathVariable("startDate")String startDate,
                                                                @PathVariable("endDate")String endDate) throws ParseException {
-        return stockService.getListOfStocksWithinTimeSpan(traceID, pageable, startDate, endDate);
+        return stockService.getListOfStocksWithinTimeSpan(pageable, startDate, endDate);
     }
 
     @Operation(summary = "Delete all Stocks for a company")
@@ -131,9 +128,8 @@ public class StockController {
                     content = @Content)
     })
     @DeleteMapping("/delete/{companyCode}")
-    public void deleteAllStocksForCompany(@RequestHeader("e-stock-market-trace-id") String traceID,
-                                          @PathVariable("companyCode") String companyCode) {
+    public void deleteAllStocksForCompany(@PathVariable("companyCode") String companyCode) {
 
-        stockService.deleteAllStocksForCompany(traceID, companyCode);
+        stockService.deleteAllStocksForCompany(companyCode);
     }
 }

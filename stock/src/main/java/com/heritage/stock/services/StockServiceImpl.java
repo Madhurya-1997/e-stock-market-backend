@@ -37,7 +37,7 @@ public class StockServiceImpl implements StockService{
 
     @Override
 //    @Retry(name = "retryAddNewStock", fallbackMethod = "addNewStockFallback")
-    public Stock addNewStock(String traceID, String companyCode, StockRequest stock) {
+    public Stock addNewStock(String companyCode, StockRequest stock) {
 
         logger.debug("Invoking addNewStock service");
 
@@ -60,7 +60,7 @@ public class StockServiceImpl implements StockService{
     }
 
     @Override
-    public List<Stock> getListOfStocksForCompany(String traceID, Pageable pageable, String companyCode) {
+    public List<Stock> getListOfStocksForCompany(Pageable pageable, String companyCode) {
         logger.debug("Invoking getListOfStocksForCompany service");
 
         List<Stock> stocks = stockRepository.findAllByCompanyCode(companyCode);
@@ -68,7 +68,7 @@ public class StockServiceImpl implements StockService{
     }
 
     @Override
-    public List<Stock> getListOfStocksForCompanyWithinTimeSpan(String traceID, Pageable pageable, String companyCode, String startDate, String endDate) throws ParseException {
+    public List<Stock> getListOfStocksForCompanyWithinTimeSpan(Pageable pageable, String companyCode, String startDate, String endDate) throws ParseException {
         logger.debug("Invoking getListOfStocksForCompanyWithinTimeSpan service");
 
         return stockRepository.findAllByCompanyCodeAndCreatedAtBetween(pageable,
@@ -78,7 +78,7 @@ public class StockServiceImpl implements StockService{
     }
 
     @Override
-    public List<Stock> getListOfStocksWithinTimeSpan(String traceID, Pageable pageable, String startDate, String endDate) throws ParseException {
+    public List<Stock> getListOfStocksWithinTimeSpan(Pageable pageable, String startDate, String endDate) throws ParseException {
         logger.debug("Invoking getListOfStocksForCompanyWithinTimeSpan service");
 
         return stockRepository.findAllByCreatedAtBetween(pageable,
@@ -89,7 +89,7 @@ public class StockServiceImpl implements StockService{
 
     @Override
 //    @Retry(name = "retryDeleteAllStocksForCompany", fallbackMethod = "deleteAllStocksForCompanyFallback")
-    public void deleteAllStocksForCompany(String traceID, String companyCode) {
+    public void deleteAllStocksForCompany(String companyCode) {
         logger.debug("Invoking deleteAllStocksForCompany service");
 
         stockRepository.deleteAllByCompanyCode(companyCode);
